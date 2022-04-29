@@ -1,3 +1,6 @@
+include("Forward.jl")
+include("Sig.jl")
+include("Dsig.jl")
 function backPropagate(H,w_H,b_H, w_out,n,x,f,pf,IC,eta,droprate,epoch)
     # trial solutions
     y_t = 0;
@@ -31,7 +34,7 @@ function backPropagate(H,w_H,b_H, w_out,n,x,f,pf,IC,eta,droprate,epoch)
     grad_N = 0;
 
     # Cost Function Gradient
-    grad_C = @(dy_t,y_t,x) 2*(dy_t - f(y_t,x))*(1-pf(x)*x);
+    grad_C(dy_t,y_t,x) =  2*(dy_t - f(y_t,x))*(1-pf(x)*x);
 
 
     # drop learning rate by half every 20 epochs
@@ -41,18 +44,18 @@ function backPropagate(H,w_H,b_H, w_out,n,x,f,pf,IC,eta,droprate,epoch)
     for i = 1:n
         # feedforward 
         # current
-        [a_H,z_H,a_out,z_out] = feedforward(w_H,b_H,w_out,x(i));
+        a_H,z_H,a_out,z_out = feedForward(w_H,b_H,w_out,x[i]);
         
         # trial solutions
-        # y_t_m = IC + x(i)*(a_out-h);
-        y_t = IC + x(i)*a_out;
-        # y_t_p = IC + x(i)*(a_out+h);
+        # y_t_m = IC + x[i]*(a_out-h);
+        y_t = IC + x[i]*a_out;
+        # y_t_p = IC + x[i]*(a_out+h);
         
         # trial solution derivative
-        dy_t = a_out + x(i)*sum(w_out.*w_H.*dsig(z_H));
+        dy_t = a_out + x[i] * sum(w_out.*w_H.*dsig(z_H));
         
         # gradient of network wrt output
-        grad_N = grad_C(dy_t,y_t,x(i));
+        grad_N = grad_C(dy_t,y_t,x[i]);
         
         # error of layers
         # output layer
@@ -68,7 +71,7 @@ function backPropagate(H,w_H,b_H, w_out,n,x,f,pf,IC,eta,droprate,epoch)
         # hidden layer bias
         db_H = err_H;
         # hidden layer weights
-        dw_H = x(i)*err_H;
+        dw_H = x[i]*err_H;
         
         # gradient descent
         # output layer weights
@@ -78,5 +81,5 @@ function backPropagate(H,w_H,b_H, w_out,n,x,f,pf,IC,eta,droprate,epoch)
         # hidden layer weights
         w_H = w_H - eta*dw_H;
     end
-    return [w_H,b_H,w_out] 
+    return w_H,b_H,w_out
 end
