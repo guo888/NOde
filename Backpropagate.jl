@@ -41,37 +41,41 @@ function backPropagate(H,w_H,b_H, w_out,n,x,f,pf,IC,eta,droprate,epoch)
     # eta = eta*(1/2)^floor(epoch/droprate);
 
     # loop over 
-    for i = 1:n
+    for i = 1:n # x 的100个点。
         # feedforward 
         # current
         a_H,z_H,a_out,z_out = feedForward(w_H,b_H,w_out,x[i]);
         
         # trial solutions
         # y_t_m = IC + x[i]*(a_out-h);
-        y_t = IC + x[i]*a_out;
+        y_t = IC + x[i]*a_out; # a_out 即为文献中的 Ψ(xi)=a_out 
         # y_t_p = IC + x[i]*(a_out+h);
         
         # trial solution derivative
         dy_t = a_out + x[i] * sum(w_out.*w_H.*dsig(z_H));
-        
+        # w_out.*w_H.*dsig(z_H) 3项均为 10 * 1 向量， 
         # gradient of network wrt output
         grad_N = grad_C(dy_t,y_t,x[i]);
         
         # error of layers
         # output layer
-        err_out = grad_N*dsig(z_out);
+        # err_out = grad_N*dsig(z_out);
+        err_out = grad_N *sig(z_H)
         # hidden layer
-        err_H = (w_out*err_out).*dsig(z_H);
+        # err_H = (w_out*err_out).*dsig(z_H);
+        err_H = (grad_N*w_out).*dsig(z_H);
 
         # gradients of network parameters
         # update learning rate
         
         # output layer weights
-        dw_out = a_H*err_out;
+        # dw_out = a_H*err_out;
+        dw_out = err_out;
         # hidden layer bias
         db_H = err_H;
         # hidden layer weights
         dw_H = x[i]*err_H;
+        # dw_H = x[i] * w_out. * dsig(z_H) * grad_N
         
         # gradient descent
         # output layer weights

@@ -5,11 +5,12 @@ using Distributions
 # Equation Parameters
 # y' = f(y,x)
 # -----------
-
+# by guoxiaobo @czu, 2022.5.15
+# -----------
 # clear everything
 function main()
     
-    nBP = 1000
+    nBP = 20000
     # function f(y,x)
     f(y,x) = sin.(x) ;
     # Initial Condition
@@ -40,7 +41,7 @@ function main()
     droprate = 1;
     # hidden layer 神经数。
     # size
-    H = 10; 
+    H = 60; 
     # biases
     # b_H = normrnd(0,1,[H,1]);
     b_H = randn(1,H)'
