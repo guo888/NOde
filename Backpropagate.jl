@@ -66,7 +66,7 @@ function backPropagate(H,w_H,b_H, w_out,n,x,f,pf,IC,eta,droprate,epoch)
         err_H = (grad_N*w_out).*dsig(z_H);
 
         # gradients of network parameters
-        # update learning rate
+        # update llhlearning rate
         
         # output layer weights
         # dw_out = a_H*err_out;
@@ -75,7 +75,6 @@ function backPropagate(H,w_H,b_H, w_out,n,x,f,pf,IC,eta,droprate,epoch)
         db_H = err_H;
         # hidden layer weights
         dw_H = x[i]*err_H;
-        # dw_H = x[i] * w_out. * dsig(z_H) * grad_N
         
         # gradient descent
         # output layer weights
